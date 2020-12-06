@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+
+  nginx:
+    container_name: nginx
+    image: nginx:1.19.5-alpine
+    restart: always
+    tty: true
+    ports:
+      - 127.0.0.1:8080:80
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d/
+      - ./nginx/log:/var/log/nginx/
+
+  postgresql:
+    container_name: postgresql          
+    image: postgres:13.1-alpine
+    restart: always
+    env_file:
+      - database.env
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db/postgresql:/var/lib/postgresql/data
+
+  app:
+    container_name: app
+    image: app:v2
+    restart: always
+    environment:
+      - FLASK_APP="./src/app.py"
+    ports:
+      - 5000:5000
+
+networks:
+  default:
+    external:
+      name: app
+
